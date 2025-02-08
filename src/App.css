@@ -102,6 +102,48 @@ body {
   transform: scale(1.1);
 }
 
+.app {
+  --highlight-color: #00FF73;
+  --highlight-color-rgb: 0, 255, 115;
+}
+
+.app.running {
+  --highlight-color: #FF3B30;
+  --highlight-color-rgb: 255, 59, 48;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: transparent;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--highlight-color);
+  transition: all 0.3s ease;
+  text-shadow: 0 0 10px rgba(var(--highlight-color-rgb), 0.3);
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  color: var(--highlight-color);
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 10px rgba(var(--highlight-color-rgb), 0.3));
+}
+
+.menu-button:hover .menu-icon {
+  filter: drop-shadow(0 0 15px rgba(var(--highlight-color-rgb), 0.5));
+}
+
 @media (max-width: 480px) {
   .header {
     padding: 0 1rem;

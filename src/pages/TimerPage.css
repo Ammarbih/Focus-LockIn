@@ -1,25 +1,25 @@
 @keyframes neonPulse {
   0%, 100% {
-    text-shadow: 0 0 10px rgba(0, 255, 115, 0.5),
-                 0 0 20px rgba(0, 255, 115, 0.3),
-                 0 0 30px rgba(0, 255, 115, 0.2);
+    text-shadow: 0 0 7px rgba(var(--highlight-color-rgb), 0.7),
+                 0 0 10px rgba(var(--highlight-color-rgb), 0.5),
+                 0 0 21px rgba(var(--highlight-color-rgb), 0.3);
   }
   50% {
-    text-shadow: 0 0 15px rgba(0, 255, 115, 0.7),
-                 0 0 25px rgba(0, 255, 115, 0.5),
-                 0 0 35px rgba(0, 255, 115, 0.4);
+    text-shadow: 0 0 14px rgba(var(--highlight-color-rgb), 0.7),
+                 0 0 20px rgba(var(--highlight-color-rgb), 0.5),
+                 0 0 42px rgba(var(--highlight-color-rgb), 0.3);
   }
 }
 
 @keyframes circlePulse {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 255, 115, 0.2),
-                inset 0 0 20px rgba(0, 255, 115, 0.1);
+    box-shadow: 0 0 20px rgba(var(--highlight-color-rgb), 0.2),
+                inset 0 0 20px rgba(var(--highlight-color-rgb), 0.1);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 40px rgba(0, 255, 115, 0.3),
-                inset 0 0 40px rgba(0, 255, 115, 0.15);
+    box-shadow: 0 0 40px rgba(var(--highlight-color-rgb), 0.3),
+                inset 0 0 40px rgba(var(--highlight-color-rgb), 0.15);
     transform: scale(1.02);
   }
 }
@@ -37,10 +37,22 @@
 
 @keyframes buttonGlow {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(0, 255, 115, 0.2);
+    box-shadow: 0 0 5px rgba(var(--highlight-color-rgb), 0.5);
   }
   50% {
-    box-shadow: 0 0 25px rgba(0, 255, 115, 0.3);
+    box-shadow: 0 0 15px rgba(var(--highlight-color-rgb), 0.7);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
   }
 }
 
@@ -67,6 +79,18 @@
   animation: circlePulse 2s infinite ease-in-out;
 }
 
+.timer-circle.shake {
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+.timer-circle.running {
+  --highlight-color: #FF3B30;
+}
+
+.timer-circle:not(.running) {
+  --highlight-color: #00FF73;
+}
+
 .timer-display {
   position: absolute;
   top: 50%;
@@ -76,6 +100,7 @@
   grid-template-columns: auto auto auto;
   align-items: center;
   gap: min(12px, 3vw);
+  color: var(--highlight-color);
 }
 
 .time-group {
@@ -91,95 +116,162 @@
 .digit {
   font-size: min(64px, 17vw);
   font-weight: 600;
-  color: #00FF73;
+  color: var(--highlight-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   width: min(34px, 9.5vw);
   text-align: center;
   line-height: 1.2;
   animation: neonPulse 2s infinite;
+  text-shadow: 0 0 10px rgba(var(--highlight-color-rgb), 0.5);
 }
 
 .separator {
   font-size: min(64px, 17vw);
   font-weight: 600;
-  color: #00FF73;
-  line-height: 1.2;
-  text-align: center;
-  padding: 0 min(4px, 1vw);
-  transform: translateY(-2px);
+  color: var(--highlight-color);
   animation: neonPulse 2s infinite;
+  margin: 0 min(4px, 1vw);
 }
 
-.arrow {
+.digit-button {
   position: absolute;
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  color: #00FF73;
-  font-size: min(14px, 4vw);
   left: 0;
   right: 0;
-  width: min(44px, 12vw);
-  height: min(44px, 12vw);
-  margin: auto;
-  cursor: pointer;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  outline: none !important;
-  animation: slideUp 0.3s ease-out;
-}
-
-.arrow.up {
-  top: min(-48px, -13vw);
-}
-
-.arrow.down {
-  bottom: min(-48px, -13vw);
-}
-
-.controls {
-  display: flex;
-  gap: min(16px, 4vw);
-  animation: slideUp 0.5s ease-out;
-}
-
-.control-button {
-  background-color: #00FF73;
-  color: #000000;
+  margin: 0 auto;
+  background: none;
   border: none;
-  border-radius: min(24px, 6vw);
-  padding: min(14px, 3.5vw) 0;
-  font-size: min(18px, 5vw);
-  font-weight: 600;
+  color: var(--highlight-color);
+  font-size: min(20px, 5vw);
   cursor: pointer;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  width: min(160px, 45vw);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
   user-select: none;
-  transition: all 0.3s ease;
-  animation: buttonGlow 2s infinite ease-in-out;
 }
 
-.control-button.pause {
-  background-color: transparent;
-  border: 2px solid #00FF73;
-  color: #00FF73;
+.digit-button:hover {
+  color: var(--highlight-color);
+}
+
+.digit-button:active {
+  color: var(--highlight-color);
+}
+
+.digit-button:disabled {
+  opacity: 0;
+  cursor: default;
+}
+
+.digit-button.top {
+  top: min(-24px, -6vw);
+}
+
+.digit-button.bottom {
+  bottom: min(-24px, -6vw);
 }
 
 .motivation-text {
   font-size: min(32px, 8vw);
   font-weight: 600;
-  color: #00FF73;
-  margin-bottom: min(32px, 8vw);
+  color: var(--highlight-color);
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  animation: neonPulse 2s infinite, slideUp 0.5s ease-out;
+  animation: neonPulse 2s infinite;
+  margin-bottom: min(40px, 10vw);
+  text-shadow: 0 0 10px rgba(var(--highlight-color-rgb), 0.5);
+}
+
+.controls {
+  display: flex;
+  gap: 16px;
+  margin-top: min(20px, 5vw);
+}
+
+.control-button {
+  background: none;
+  border: 2px solid var(--highlight-color);
+  color: var(--highlight-color);
+  padding: min(16px, 4vw) min(32px, 8vw);
+  font-size: min(18px, 5vw);
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(var(--highlight-color-rgb), 0.3);
+  animation: buttonGlow 2s infinite;
+  outline: none;
+}
+
+.control-button:hover {
+  box-shadow: 0 0 20px rgba(var(--highlight-color-rgb), 0.5);
+}
+
+.control-button.start {
+  background-color: #00FF73;
+  color: #000000;
+}
+
+.control-button.start:focus {
+  background-color: #00FF73;
+  color: #000000;
+}
+
+.control-button.start:hover {
+  background-color: #00FF73;
+  color: #000000;
+  filter: brightness(1.1);
+}
+
+.control-button.stop {
+  background-color: #FF3B30;
+  border-color: #FF3B30;
+  color: #000000;
+}
+
+.control-button.stop:focus {
+  background-color: #FF3B30;
+  border-color: #FF3B30;
+  color: #000000;
+}
+
+.control-button.stop:hover {
+  background-color: #FF3B30;
+  border-color: #FF3B30;
+  color: #000000;
+  filter: brightness(1.1);
+}
+
+.control-button.pause,
+.control-button.resume {
+  border-color: var(--highlight-color);
+  color: var(--highlight-color);
+}
+
+.control-button.pause:hover,
+.control-button.resume:hover {
+  background-color: rgba(var(--highlight-color-rgb), 0.1);
+}
+
+.control-button.done {
+  background-color: var(--highlight-color);
+  color: #000000;
+  font-size: min(24px, 6vw);
+  padding: min(20px, 5vw) min(40px, 10vw);
+  animation: buttonGlow 2s infinite;
+}
+
+.control-button.done:focus {
+  background-color: var(--highlight-color);
+  color: #000000;
+}
+
+.control-button.done:hover {
+  background-color: var(--highlight-color);
+  color: #000000;
+  filter: brightness(1.1);
 }
 
 .timer-page {
@@ -221,64 +313,66 @@
   border-radius: 50%;
 }
 
-.digit-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  position: relative;
-}
-
-.digit-adjust {
-  background: none;
-  border: none;
-  color: #00FF73;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0;
-  opacity: 0.9;
-  text-shadow: 0 0 8px rgba(0, 255, 115, 0.6);
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.digit-adjust.up {
-  top: -24px;
-}
-
-.digit-adjust.down {
-  bottom: -24px;
-}
-
 .progress-ring {
   position: absolute;
-  top: -2px;
-  left: -2px;
-  width: calc(100% + 4px);
-  height: calc(100% + 4px);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   transform: rotate(-90deg);
 }
 
 .progress-ring-circle-bg {
-  opacity: 0.15;
-}
-
-.progress-ring-circle {
-  transition: stroke-dashoffset 0.95s linear;
-  stroke: #00FF73;
+  fill: none;
+  stroke: rgba(var(--highlight-color-rgb), 0.1);
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(0, 255, 115, 0.6));
 }
 
-.progress-ring-circle-bg,
 .progress-ring-circle {
-  vector-effect: non-scaling-stroke;
+  fill: none;
+  stroke: var(--highlight-color);
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 3px rgba(var(--highlight-color-rgb), 0.7));
+  stroke-linecap: round;
+}
+
+:root {
+  --highlight-color: #00FF73;
+  --highlight-color-rgb: 0, 255, 115;
+}
+
+.timer-container.running {
+  --highlight-color: #FF3B30;
+  --highlight-color-rgb: 255, 59, 48;
+}
+
+@keyframes circlePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 10px rgba(var(--highlight-color-rgb), 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgba(var(--highlight-color-rgb), 0.5));
+  }
+}
+
+.logo {
+  color: var(--highlight-color);
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 10px rgba(var(--highlight-color-rgb), 0.3));
+}
+
+.logo:hover {
+  filter: drop-shadow(0 0 15px rgba(var(--highlight-color-rgb), 0.5));
+}
+
+.menu-icon {
+  color: var(--highlight-color);
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 10px rgba(var(--highlight-color-rgb), 0.3));
+}
+
+.menu-icon:hover {
+  filter: drop-shadow(0 0 15px rgba(var(--highlight-color-rgb), 0.5));
 }
 
 @media (max-width: 480px) {
@@ -296,21 +390,21 @@
     font-size: 4rem;
   }
 
-  .digit-adjust {
+  .digit-button {
     font-size: 1rem;
     width: 30px;
     height: 30px;
   }
 
-  .digit-adjust.up {
+  .digit-button.top {
     top: -35px;
   }
 
-  .digit-adjust.down {
+  .digit-button.bottom {
     bottom: -35px;
   }
 
-  .motivational-text {
+  .motivation-text {
     font-size: 1.8rem;
   }
 

@@ -52,4 +52,4 @@ const Timer: React.FC<TimerProps> = ({ initialMinutes, onComplete }) => {
   );
 };
 
-export default Timer; 
+export default Timer;

@@ -19,12 +19,91 @@ const TimerPage: React.FC = () => {
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [motivationText, setMotivationText] = useState(MOTIVATION_TEXTS[0]);
   const [progress, setProgress] = useState(0);
-  const [totalSeconds, setTotalSeconds] = useState(0);
+  const [audioLoaded, setAudioLoaded] = useState(false);
   
   const intervalRef = useRef<number>();
   const initialTimeRef = useRef({ minutes: 26, seconds: 0 });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Initialize audio on component mount
+  useEffect(() => {
+    const audio = new Audio(process.env.PUBLIC_URL + '/Sounds/Alarm.MP3');
+    audio.loop = true;
+    
+    // Load the audio file
+    audio.load();
+    
+    // Set up event listeners
+    audio.addEventListener('canplaythrough', () => {
+      setAudioLoaded(true);
+      console.log('Audio loaded and ready to play');
+    });
+
+    audio.addEventListener('error', (e) => {
+      console.error('Error loading audio:', e);
+    });
+
+    audioRef.current = audio;
+
+    // Cleanup
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  // Handle audio playback
+  const startAlarm = async () => {
+    if (audioRef.current && audioLoaded) {
+      try {
+        audioRef.current.currentTime = 0;
+        // Use await to catch any autoplay restrictions
+        await audioRef.current.play();
+      } catch (error) {
+        console.error('Error playing alarm:', error);
+        // If autoplay is blocked, try to play on next user interaction
+        const playOnInteraction = async () => {
+          try {
+            await audioRef.current?.play();
+            document.removeEventListener('touchstart', playOnInteraction);
+            document.removeEventListener('click', playOnInteraction);
+          } catch (e) {
+            console.error('Still cannot play audio:', e);
+          }
+        };
+        document.addEventListener('touchstart', playOnInteraction);
+        document.addEventListener('click', playOnInteraction);
+      }
+    }
+  };
+
+  const stopAlarm = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  // Start preloading audio when user first interacts with the page
+  const handleFirstInteraction = () => {
+    if (audioRef.current && !audioLoaded) {
+      audioRef.current.load();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+    document.addEventListener('click', handleFirstInteraction, { once: true });
+    return () => {
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('click', handleFirstInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     if (isRunning && !isPaused) {
@@ -37,8 +116,10 @@ const TimerPage: React.FC = () => {
             if (minutes === 0) {
               setIsRunning(false);
               setIsPaused(false);
+              setMotivationText("TIME'S UP!");
               setProgress(100);
-              setMotivationText(MOTIVATION_TEXTS[9]);
+              setIsCompleted(true);
+              startAlarm(); // Start the alarm when timer completes
               return 0;
             }
             newSeconds = 59;
@@ -48,14 +129,11 @@ const TimerPage: React.FC = () => {
             newSeconds = prevSeconds - 1;
           }
 
-          // Bereken percentage voor voortgangsbalk
-          const currentTotal = (newMinutes * 60) + newSeconds;
-          const progressPercentage = Math.round((currentTotal / totalSeconds) * 100);
-          setProgress(100 - progressPercentage); // Draai het percentage om
-
-          // Bereken percentage voor motivatie tekst
-          const timePercentage = progressPercentage;
-          const textIndex = 9 - Math.floor(timePercentage / 10);
+          const currentTotalSeconds = (newMinutes * 60) + newSeconds;
+          const initialTotalSeconds = (initialTimeRef.current.minutes * 60) + initialTimeRef.current.seconds;
+          const percentageRemaining = (currentTotalSeconds / initialTotalSeconds) * 100;
+          setProgress(100 - percentageRemaining);
+          const textIndex = Math.floor((100 - percentageRemaining) / 10);
           setMotivationText(MOTIVATION_TEXTS[Math.min(textIndex, 9)]);
 
           return newSeconds;
@@ -68,21 +146,22 @@ const TimerPage: React.FC = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, isPaused, minutes, totalSeconds]);
+  }, [isRunning, isPaused, minutes]);
 
   const startTimer = () => {
     setIsRunning(true);
     setIsPaused(false);
+    setIsCompleted(false);
     initialTimeRef.current = { minutes, seconds };
-    const total = (minutes * 60) + seconds;
-    setTotalSeconds(total);
     setProgress(0);
     setMotivationText(MOTIVATION_TEXTS[0]);
   };
 
   const stopTimer = () => {
+    stopAlarm(); // Stop alarm if it's playing
     setIsRunning(false);
     setIsPaused(false);
+    setIsCompleted(false);
     setMinutes(initialTimeRef.current.minutes);
     setSeconds(initialTimeRef.current.seconds);
     setProgress(0);
@@ -97,114 +176,160 @@ const TimerPage: React.FC = () => {
     setIsPaused(false);
   };
 
+  const handleDone = () => {
+    stopAlarm(); // Stop the alarm when Done is clicked
+    setIsCompleted(false);
+    setMinutes(initialTimeRef.current.minutes);
+    setSeconds(initialTimeRef.current.seconds);
+    setProgress(0);
+    setMotivationText(MOTIVATION_TEXTS[0]);
+  };
+
   const adjustDigit = (type: 'minutes' | 'seconds', position: 'tens' | 'ones', increment: boolean) => {
     if (isRunning) return;
-    
-    if (type === 'minutes') {
-      setMinutes(prev => {
-        const tens = Math.floor(prev / 10);
-        const ones = prev % 10;
-        
-        if (position === 'tens') {
-          const newTens = increment ? (tens + 1) % 10 : (tens - 1 + 10) % 10;
-          return newTens * 10 + ones;
-        } else {
-          const newOnes = increment ? (ones + 1) % 10 : (ones - 1 + 10) % 10;
-          return tens * 10 + newOnes;
-        }
-      });
+
+    const setValue = type === 'minutes' ? setMinutes : setSeconds;
+    const currentValue = type === 'minutes' ? minutes : seconds;
+    const max = type === 'minutes' ? 99 : 59;
+
+    let newValue = currentValue;
+    const incrementValue = position === 'tens' ? 10 : 1;
+
+    if (increment) {
+      newValue += incrementValue;
+      if (newValue > max) newValue = 0;
     } else {
-      setSeconds(prev => {
-        const tens = Math.floor(prev / 10);
-        const ones = prev % 10;
-        
-        if (position === 'tens') {
-          const newTens = increment ? (tens + 1) % 6 : (tens - 1 + 6) % 6;
-          return newTens * 10 + ones;
-        } else {
-          const newOnes = increment ? (ones + 1) % 10 : (ones - 1 + 10) % 10;
-          return tens * 10 + newOnes;
-        }
-      });
+      newValue -= incrementValue;
+      if (newValue < 0) newValue = max;
     }
+
+    setValue(newValue);
   };
-
-  const formatNumber = (num: number): string[] => {
-    return num.toString().padStart(2, '0').split('');
-  };
-
-  const renderDigit = (type: 'minutes' | 'seconds', digit: string, position: 'tens' | 'ones') => (
-    <div className="digit-group">
-      {!isRunning && (
-        <button className="arrow up" onClick={() => adjustDigit(type, position, true)}>▲</button>
-      )}
-      <div className="digit">{digit}</div>
-      {!isRunning && (
-        <button className="arrow down" onClick={() => adjustDigit(type, position, false)}>▼</button>
-      )}
-    </div>
-  );
-
-  const minuteDigits = formatNumber(minutes);
-  const secondDigits = formatNumber(seconds);
-
-  const size = 380;
-  const strokeWidth = 6;
-  const radius = (size / 2) - strokeWidth;
-  const circumference = 2 * Math.PI * radius;
-  const offset = (progress / 100) * circumference;
 
   return (
-    <div className="timer-container">
+    <div className={`timer-container ${isRunning ? 'running' : ''}`}>
       <div className="motivation-text">{motivationText}</div>
-      <div className="timer-circle">
-        <svg className="progress-ring" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <div className={`timer-circle ${isCompleted ? 'shake' : ''} ${isRunning ? 'running' : ''}`}>
+        <svg className="progress-ring" viewBox="0 0 100 100">
           <circle
             className="progress-ring-circle-bg"
-            stroke="#00FF73"
-            strokeWidth={strokeWidth}
-            fill="transparent"
-            r={radius}
-            cx={size/2}
-            cy={size/2}
-            transform="rotate(-90 190 190)"
+            cx="50"
+            cy="50"
+            r="47"
+            strokeWidth="3"
           />
           <circle
             className="progress-ring-circle"
-            stroke="#00FF73"
-            strokeWidth={strokeWidth}
-            fill="transparent"
-            r={radius}
-            cx={size/2}
-            cy={size/2}
-            transform="rotate(-90 190 190)"
+            cx="50"
+            cy="50"
+            r="47"
+            strokeWidth="3"
             style={{
-              strokeDasharray: `${circumference} ${circumference}`,
-              strokeDashoffset: offset
+              strokeDasharray: `${2 * Math.PI * 47}`,
+              strokeDashoffset: `${2 * Math.PI * 47 * (1 - progress / 100)}`
             }}
           />
         </svg>
         <div className="timer-display">
           <div className="time-group">
-            {renderDigit('minutes', minuteDigits[0], 'tens')}
-            {renderDigit('minutes', minuteDigits[1], 'ones')}
+            <div className="digit-group">
+              <button
+                className="digit-button top"
+                onClick={() => adjustDigit('minutes', 'tens', true)}
+                disabled={isRunning}
+              >
+                ▲
+              </button>
+              <div className="digit">{Math.floor(minutes / 10)}</div>
+              <button
+                className="digit-button bottom"
+                onClick={() => adjustDigit('minutes', 'tens', false)}
+                disabled={isRunning}
+              >
+                ▼
+              </button>
+            </div>
+            <div className="digit-group">
+              <button
+                className="digit-button top"
+                onClick={() => adjustDigit('minutes', 'ones', true)}
+                disabled={isRunning}
+              >
+                ▲
+              </button>
+              <div className="digit">{minutes % 10}</div>
+              <button
+                className="digit-button bottom"
+                onClick={() => adjustDigit('minutes', 'ones', false)}
+                disabled={isRunning}
+              >
+                ▼
+              </button>
+            </div>
           </div>
           <div className="separator">:</div>
           <div className="time-group">
-            {renderDigit('seconds', secondDigits[0], 'tens')}
-            {renderDigit('seconds', secondDigits[1], 'ones')}
+            <div className="digit-group">
+              <button
+                className="digit-button top"
+                onClick={() => adjustDigit('seconds', 'tens', true)}
+                disabled={isRunning}
+              >
+                ▲
+              </button>
+              <div className="digit">{Math.floor(seconds / 10)}</div>
+              <button
+                className="digit-button bottom"
+                onClick={() => adjustDigit('seconds', 'tens', false)}
+                disabled={isRunning}
+              >
+                ▼
+              </button>
+            </div>
+            <div className="digit-group">
+              <button
+                className="digit-button top"
+                onClick={() => adjustDigit('seconds', 'ones', true)}
+                disabled={isRunning}
+              >
+                ▲
+              </button>
+              <div className="digit">{seconds % 10}</div>
+              <button
+                className="digit-button bottom"
+                onClick={() => adjustDigit('seconds', 'ones', false)}
+                disabled={isRunning}
+              >
+                ▼
+              </button>
+            </div>
           </div>
         </div>
       </div>
+
       <div className="controls">
-        {!isRunning ? (
-          <button className="control-button" onClick={startTimer}>START</button>
+        {isCompleted ? (
+          <button className="control-button done" onClick={handleDone}>
+            Done
+          </button>
+        ) : !isRunning ? (
+          <button className="control-button start" onClick={startTimer}>
+            Start
+          </button>
         ) : (
           <>
-            <button className="control-button" onClick={stopTimer}>STOP</button>
-            <button className="control-button pause" onClick={isPaused ? resumeTimer : pauseTimer}>
-              {isPaused ? 'RESUME' : 'PAUSE'}
+            <button className="control-button stop" onClick={stopTimer}>
+              Stop
             </button>
+            {!isPaused ? (
+              <button className="control-button pause" onClick={pauseTimer}>
+                Pause
+              </button>
+            ) : (
+              <button className="control-button resume" onClick={resumeTimer}>
+                Resume
+              </button>
+            )}
           </>
         )}
       </div>
