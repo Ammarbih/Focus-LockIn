@@ -14,7 +14,10 @@
     "react-icons": "^5.4.0",
     "react-native": "0.76.7",
     "react-router-dom": "^6.0.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "typescript": "^4.9.5",
+    "react-native-web": "~0.19.13",
+    "@expo/metro-runtime": "~4.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -35,8 +38,5 @@
       "last 1 safari version"
     ]
   },
-  "main": "node_modules/expo/AppEntry.js",
-  "devDependencies": {
-    "typescript": "^5.3.3"
-  }
+  "main": "node_modules/expo/AppEntry.js"
 }
