@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Focus-LockIn/static/css/main.0118a75a.css",
+    "main.js": "/Focus-LockIn/static/js/main.532e7b92.js",
+    "index.html": "/Focus-LockIn/index.html",
+    "main.0118a75a.css.map": "/Focus-LockIn/static/css/main.0118a75a.css.map",
+    "main.532e7b92.js.map": "/Focus-LockIn/static/js/main.532e7b92.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0118a75a.css",
+    "static/js/main.532e7b92.js"
+  ]
+}

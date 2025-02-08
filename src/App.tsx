@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { HashRouter as Router } from 'react-router-dom';
 import TimerPage from './pages/TimerPage';
 import { TimerProvider } from './contexts/TimerContext';
 import { SettingsProvider } from './contexts/SettingsContext';
