@@ -1,0 +1,331 @@
+@keyframes neonPulse {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(0, 255, 115, 0.5),
+                 0 0 20px rgba(0, 255, 115, 0.3),
+                 0 0 30px rgba(0, 255, 115, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(0, 255, 115, 0.7),
+                 0 0 25px rgba(0, 255, 115, 0.5),
+                 0 0 35px rgba(0, 255, 115, 0.4);
+  }
+}
+
+@keyframes circlePulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(0, 255, 115, 0.2),
+                inset 0 0 20px rgba(0, 255, 115, 0.1);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(0, 255, 115, 0.3),
+                inset 0 0 40px rgba(0, 255, 115, 0.15);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes buttonGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 115, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 255, 115, 0.3);
+  }
+}
+
+.timer-container {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #000000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 20px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.timer-circle {
+  width: min(380px, 90vw);
+  height: min(380px, 90vw);
+  border-radius: 50%;
+  position: relative;
+  background: #000000;
+  transition: all 0.3s ease;
+  animation: circlePulse 2s infinite ease-in-out;
+}
+
+.timer-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  gap: min(12px, 3vw);
+}
+
+.time-group {
+  display: flex;
+  gap: min(8px, 2vw);
+}
+
+.digit-group {
+  position: relative;
+  width: min(34px, 9.5vw);
+}
+
+.digit {
+  font-size: min(64px, 17vw);
+  font-weight: 600;
+  color: #00FF73;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  width: min(34px, 9.5vw);
+  text-align: center;
+  line-height: 1.2;
+  animation: neonPulse 2s infinite;
+}
+
+.separator {
+  font-size: min(64px, 17vw);
+  font-weight: 600;
+  color: #00FF73;
+  line-height: 1.2;
+  text-align: center;
+  padding: 0 min(4px, 1vw);
+  transform: translateY(-2px);
+  animation: neonPulse 2s infinite;
+}
+
+.arrow {
+  position: absolute;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: #00FF73;
+  font-size: min(14px, 4vw);
+  left: 0;
+  right: 0;
+  width: min(44px, 12vw);
+  height: min(44px, 12vw);
+  margin: auto;
+  cursor: pointer;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none !important;
+  animation: slideUp 0.3s ease-out;
+}
+
+.arrow.up {
+  top: min(-48px, -13vw);
+}
+
+.arrow.down {
+  bottom: min(-48px, -13vw);
+}
+
+.controls {
+  display: flex;
+  gap: min(16px, 4vw);
+  animation: slideUp 0.5s ease-out;
+}
+
+.control-button {
+  background-color: #00FF73;
+  color: #000000;
+  border: none;
+  border-radius: min(24px, 6vw);
+  padding: min(14px, 3.5vw) 0;
+  font-size: min(18px, 5vw);
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  width: min(160px, 45vw);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: all 0.3s ease;
+  animation: buttonGlow 2s infinite ease-in-out;
+}
+
+.control-button.pause {
+  background-color: transparent;
+  border: 2px solid #00FF73;
+  color: #00FF73;
+}
+
+.motivation-text {
+  font-size: min(32px, 8vw);
+  font-weight: 600;
+  color: #00FF73;
+  margin-bottom: min(32px, 8vw);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: neonPulse 2s infinite, slideUp 0.5s ease-out;
+}
+
+.timer-page {
+  min-height: 100vh;
+  background-color: #000000;
+  color: #00FF73;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+}
+
+.timer-title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+  color: #00FF73;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  color: #00FF73;
+  font-size: 24px;
+  padding: 8px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0A3323;
+  border-radius: 50%;
+}
+
+.digit-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+.digit-adjust {
+  background: none;
+  border: none;
+  color: #00FF73;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.9;
+  text-shadow: 0 0 8px rgba(0, 255, 115, 0.6);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.digit-adjust.up {
+  top: -24px;
+}
+
+.digit-adjust.down {
+  bottom: -24px;
+}
+
+.progress-ring {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  transform: rotate(-90deg);
+}
+
+.progress-ring-circle-bg {
+  opacity: 0.15;
+}
+
+.progress-ring-circle {
+  transition: stroke-dashoffset 0.95s linear;
+  stroke: #00FF73;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 115, 0.6));
+}
+
+.progress-ring-circle-bg,
+.progress-ring-circle {
+  vector-effect: non-scaling-stroke;
+}
+
+@media (max-width: 480px) {
+  .timer-circle {
+    width: 250px;
+    height: 250px;
+  }
+
+  .digit {
+    font-size: 4rem;
+    width: 45px;
+  }
+
+  .separator {
+    font-size: 4rem;
+  }
+
+  .digit-adjust {
+    font-size: 1rem;
+    width: 30px;
+    height: 30px;
+  }
+
+  .digit-adjust.up {
+    top: -35px;
+  }
+
+  .digit-adjust.down {
+    bottom: -35px;
+  }
+
+  .motivational-text {
+    font-size: 1.8rem;
+  }
+
+  .controls {
+    gap: 1rem;
+  }
+
+  .control-button {
+    padding: 0.8rem 3rem;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  html, body {
+    height: -webkit-fill-available;
+    overscroll-behavior-y: none;
+  }
+}

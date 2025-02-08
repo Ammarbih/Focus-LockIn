@@ -1,0 +1,34 @@
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timer-display {
+  font-size: 72px;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+.timer-button {
+  padding: 12px 32px;
+  font-size: 18px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.timer-button:not(.running) {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.timer-button.running {
+  background-color: var(--error-color);
+  color: white;
+} 
